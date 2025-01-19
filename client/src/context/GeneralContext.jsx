@@ -7,11 +7,8 @@ const GeneralContextProvider = ({ children }) => {
   const [username, setUsername] = useState("");
   const [room, setRoom] = useState("");
   const [roomUsers, setRoomUsers] = useState(["user1", "user2", "user3"]);
-  const [receivedMessages, setReceivedMessages] = useState([
-    "user1",
-    "user2",
-    "user3",
-  ]);
+  const [socket, setSocket] = useState(null);
+  const [receivedMessages, setReceivedMessages] = useState([]);
 
   return (
     <GeneralContext.Provider
@@ -22,6 +19,8 @@ const GeneralContextProvider = ({ children }) => {
         setRoom,
         roomUsers,
         setRoomUsers,
+        socket,
+        setSocket,
         receivedMessages,
         setReceivedMessages,
       }}

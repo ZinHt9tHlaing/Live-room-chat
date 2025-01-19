@@ -1,4 +1,5 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
+import { formatDistanceToNow } from "date-fns";
 import { GeneralContext } from "../context/GeneralContext";
 import {
   ArrowRightStartOnRectangleIcon,
@@ -7,9 +8,11 @@ import {
   PaperAirplaneIcon,
 } from "@heroicons/react/24/outline";
 import { UserIcon } from "@heroicons/react/24/solid";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Room = () => {
+  const navigate = useNavigate();
+
   const {
     username,
     room,
@@ -17,7 +20,20 @@ const Room = () => {
     setRoomUsers,
     receivedMessages,
     setReceivedMessages,
+    socket,
   } = useContext(GeneralContext);
+
+  useEffect(() => {
+    socket.on("message", (data) => {
+      setReceivedMessages((prev) => [...prev, data]);
+    });
+
+    return () => socket.disconnect();
+  }, [socket]);
+
+  const leaveRoom = () => {
+    navigate("/");
+  };
 
   return (
     <section className="flex gap-4 h-screen">
@@ -45,7 +61,10 @@ const Room = () => {
             </p>
           ))}
         </div>
-        <button className="absolute bottom-0 text-sm md:text-base group  flex items-center mx-2 mb-3 md:p-3 active:scale-95 duration-200">
+        <button
+          onClick={leaveRoom}
+          className="absolute bottom-0 text-sm md:text-base group  flex items-center mx-2 mb-3 md:p-3 active:scale-95 duration-200"
+        >
           <ArrowRightStartOnRectangleIcon
             width={30}
             className="ms-3 md:ms-6 mr-1 group-hover:translate-x-1 duration-300"
@@ -62,10 +81,12 @@ const Room = () => {
               key={index}
               className="text-white bg-blue-600 mb-3 px-3 py-2 w-[85%] md:w-3/4 rounded-br-2xl rounded-tr-2xl rounded-tl-3xl"
             >
-              <p className="text-sm font-mono text-gray-100">from bot</p>
-              <h4 className="text-xl font-semibold">{msg}</h4>
+              <p className="text-sm font-mono text-gray-100">
+                from {msg.username}
+              </p>
+              <h4 className="text-xl font-semibold">{msg.message}</h4>
               <p className="text-sm font-mono text-right font-medium text-gray-100">
-                less than a minutes
+                {formatDistanceToNow(new Date(msg.sent_at))}
               </p>
             </div>
           ))}

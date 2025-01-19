@@ -1,11 +1,13 @@
 import { useContext } from "react";
 import { GeneralContext } from "../context/GeneralContext";
 import { useNavigate } from "react-router-dom";
+import socketIO from "socket.io-client";
 
 const Welcome = () => {
-  const nav = useNavigate();
+  const navigate = useNavigate();
 
-  const { username, setUsername, room, setRoom } = useContext(GeneralContext);
+  const { username, setUsername, room, setRoom, setSocket } =
+    useContext(GeneralContext);
 
   const joinRoom = (e) => {
     e.preventDefault();
@@ -14,7 +16,10 @@ const Welcome = () => {
       room !== "select-room" &&
       room.trim().length > 0
     ) {
-      nav("/chat", { replace: true });
+      const socket = socketIO.connect("http://localhost:8000");
+      setSocket(socket);
+
+      navigate("/chat", { replace: true });
     } else {
       alert("Fill all user info.");
     }
